@@ -1,9 +1,7 @@
 {
   "ExpandedNodes": [
-    "",
-    "\\backend",
-    "\\backend\\api"
+    ""
   ],
-  "SelectedNode": "\\backend\\api",
+  "SelectedNode": "\\webapi.sln",
   "PreviewInSolutionExplorer": false
 }
