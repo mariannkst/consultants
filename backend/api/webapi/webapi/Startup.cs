@@ -10,6 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Serialization;
+using System.IO;
+using Microsoft.Extensions.FileProviders;
 
 namespace webapi
 {
@@ -25,6 +28,19 @@ namespace webapi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Enable CORS (=Cross Origin Requests)
+            services.AddCors(c =>
+            {
+                c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            });
+
+            // JSON Serializer - to keep JSON serializer as a default
+            services.AddControllersWithViews()
+                .AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore)
+                .AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver =
+                new DefaultContractResolver());
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -35,6 +51,8 @@ namespace webapi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -50,6 +68,17 @@ namespace webapi
             {
                 endpoints.MapControllers();
             });
+
+
+            // Instructions for using the Img folder
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                    Path.Combine(Directory.GetCurrentDirectory(),"Img")),
+                RequestPath="/Img"
+            });
+
+
         }
     }
 }
